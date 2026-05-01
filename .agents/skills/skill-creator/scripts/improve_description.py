@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Improve a skill description based on eval results.
 
 Takes eval results (from run_eval.py) and generates an improved description

@@ -943,7 +943,7 @@
         document.getElementById('grades-arrow').classList.remove('open');
 
         const summary = grading.summary || {};
-        const expectations = grading.expectations || [];
+        const expectations = grading.assertion_results || grading.expectations || [];
 
         let html = '<div style="padding: 1rem;">';
 
@@ -1233,11 +1233,20 @@
         }
 
         function deltaClass(val) {
-          if (!val) return '';
+          if (val == null) return '';
           const n = parseFloat(val);
+          if (isNaN(n)) return '';
           if (n > 0) return 'benchmark-delta-positive';
           if (n < 0) return 'benchmark-delta-negative';
           return '';
+        }
+
+        function fmtDelta(val, suffix, decimals) {
+          if (val == null) return '—';
+          const n = parseFloat(val);
+          if (isNaN(n)) return String(val);
+          const formatted = n.toFixed(decimals != null ? decimals : 2);
+          return (n >= 0 ? '+' : '') + formatted + (suffix || '');
         }
 
         // Discover config names dynamically (everything except "delta")
@@ -1265,7 +1274,7 @@
           '<td class="' +
           deltaClass(delta.pass_rate) +
           '">' +
-          (delta.pass_rate || '—') +
+          fmtDelta(delta.pass_rate, '', 2) +
           '</td></tr>';
 
         // Time (only show row if data exists)
@@ -1277,7 +1286,7 @@
             '<td class="' +
             deltaClass(delta.time_seconds) +
             '">' +
-            (delta.time_seconds ? delta.time_seconds + 's' : '—') +
+            fmtDelta(delta.time_seconds, 's', 1) +
             '</td></tr>';
         }
 
@@ -1287,7 +1296,7 @@
           html += '<td>' + fmtStat(a.tokens, false) + '</td>';
           html += '<td>' + fmtStat(b.tokens, false) + '</td>';
           html +=
-            '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || '—') + '</td></tr>';
+            '<td class="' + deltaClass(delta.tokens) + '">' + fmtDelta(delta.tokens, '', 0) + '</td></tr>';
         }
 
         html += '</tbody></table>';
@@ -1392,7 +1401,7 @@
             const runsWithExpectations = {};
             for (const config of configGroups) {
               runsWithExpectations[config] = evalRuns.filter(
-                (r) => r.configuration === config && r.expectations && r.expectations.length > 0,
+                (r) => r.configuration === config && (r.assertion_results || r.expectations) && (r.assertion_results || r.expectations).length > 0,
               );
             }
             const hasAnyExpectations = Object.values(runsWithExpectations).some(
@@ -1404,7 +1413,7 @@
               const seen = new Set();
               for (const config of configGroups) {
                 for (const run of runsWithExpectations[config]) {
-                  for (const exp of run.expectations || []) {
+                  for (const exp of (run.assertion_results || run.expectations || [])) {
                     if (!seen.has(exp.text)) {
                       seen.add(exp.text);
                       allAssertions.push(exp.text);
@@ -1427,7 +1436,7 @@
                 for (const config of configGroups) {
                   html += '<td>';
                   for (const run of runsWithExpectations[config]) {
-                    const exp = (run.expectations || []).find((e) => e.text === assertionText);
+                    const exp = (run.assertion_results || run.expectations || []).find((e) => e.text === assertionText);
                     if (exp) {
                       const cls = exp.passed
                         ? 'benchmark-delta-positive'

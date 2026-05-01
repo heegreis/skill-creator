@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Run the eval + improve loop until all pass or max iterations reached.
 
 Combines run_eval.py and improve_description.py in a loop, tracking history
@@ -58,6 +62,7 @@ def run_loop(
     verbose: bool,
     live_report_path: Path | None = None,
     log_dir: Path | None = None,
+    adapter_name: str = "claude-code",
 ) -> dict:
     """Run the eval + improvement loop."""
     project_root = find_project_root()
@@ -96,6 +101,7 @@ def run_loop(
             runs_per_query=runs_per_query,
             trigger_threshold=trigger_threshold,
             model=model,
+            adapter_name=adapter_name,
         )
         eval_elapsed = time.time() - t0
 
@@ -256,6 +262,12 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
     parser.add_argument("--report", default="auto", help="Generate HTML report at this path (default: 'auto' for temp file, 'none' to disable)")
     parser.add_argument("--results-dir", default=None, help="Save all outputs (results.json, report.html, log.txt) to a timestamped subdirectory here")
+    parser.add_argument(
+        "--adapter",
+        default="claude-code",
+        choices=["claude-code", "kilo", "manual"],
+        help="Trigger detection adapter to use (default: claude-code)",
+    )
     args = parser.parse_args()
 
     eval_set = json.loads(Path(args.eval_set).read_text())
@@ -304,6 +316,7 @@ def main():
         verbose=args.verbose,
         live_report_path=live_report_path,
         log_dir=log_dir,
+        adapter_name=args.adapter,
     )
 
     # Save JSON output

@@ -1,0 +1,41 @@
+{
+  "skill_name": "skill-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to wrap the bash pipeline I use to normalise CSV exports from our internal billing system into a skill. Here's what I do: first I run `sed -i 's/\\r//' raw.csv` to strip Windows line endings, then `python normalise_billing.py raw.csv > normalised.csv` using a script I already have. Can you help me turn this into a skill?",
+      "expected_output": "A new skill with SKILL.md, appropriate name/description, and guidance on bundling the normalise_billing.py script.",
+      "files": [],
+      "assertions": [
+        "The assistant offers to create a new SKILL.md for the described workflow",
+        "The skill description covers when to trigger it (CSV normalisation / billing export workflows)",
+        "The assistant asks clarifying questions or extracts intent before writing the SKILL.md"
+      ],
+      "should_trigger": true
+    },
+    {
+      "id": 2,
+      "prompt": "I have an existing `pdf-tools` skill but the description doesn't seem to be triggering reliably. Can you optimize the description for better triggering accuracy?",
+      "expected_output": "The assistant reads the skill, generates trigger eval queries, and offers to run the optimization loop.",
+      "files": [],
+      "assertions": [
+        "The assistant recognises this as a description optimization task",
+        "The assistant mentions generating trigger eval queries or running run_loop.py",
+        "The assistant asks to see or reads the existing skill's SKILL.md"
+      ],
+      "should_trigger": true
+    },
+    {
+      "id": 3,
+      "prompt": "My pytest suite is failing with 15 errors after I upgraded to Python 3.12. Can you help me fix them? Here's the traceback: AttributeError: module 'ast' has no attribute 'Num'",
+      "expected_output": "The assistant directly helps debug and fix the Python 3.12 AST API changes without invoking skill-creator.",
+      "files": [],
+      "assertions": [
+        "The assistant does NOT attempt to create a new skill",
+        "The assistant directly addresses the Python 3.12 deprecation of ast.Num",
+        "The response is focused on fixing the test failures, not on skill creation"
+      ],
+      "should_trigger": false
+    }
+  ]
+}

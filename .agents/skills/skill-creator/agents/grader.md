@@ -12,7 +12,7 @@ You have two jobs: grade the outputs, and critique the evals themselves. A passi
 
 You receive these parameters in your prompt:
 
-- **expectations**: List of expectations to evaluate (strings)
+- **assertions**: List of assertions to evaluate (strings)
 - **transcript_path**: Path to the execution transcript (markdown file)
 - **outputs_dir**: Directory containing output files from execution
 
@@ -32,7 +32,7 @@ You receive these parameters in your prompt:
 
 ### Step 3: Evaluate Each Assertion
 
-For each expectation:
+For each assertion:
 
 1. **Search for evidence** in the transcript and outputs
 2. **Determine verdict**:
@@ -88,19 +88,19 @@ Save results to `{outputs_dir}/../grading.json` (sibling to outputs_dir).
 
 **PASS when**:
 
-- The transcript or outputs clearly demonstrate the expectation is true
+- The transcript or outputs clearly demonstrate the assertion is true
 - Specific evidence can be cited
 - The evidence reflects genuine substance, not just surface compliance (e.g., a file exists AND contains correct content, not just the right filename)
 
 **FAIL when**:
 
-- No evidence found for the expectation
-- Evidence contradicts the expectation
-- The expectation cannot be verified from available information
+- No evidence found for the assertion
+- Evidence contradicts the assertion
+- The assertion cannot be verified from available information
 - The evidence is superficial — the assertion is technically satisfied but the underlying task outcome is wrong or incomplete
 - The output appears to meet the assertion by coincidence rather than by actually doing the work
 
-**When uncertain**: The burden of proof to pass is on the expectation.
+**When uncertain**: The burden of proof to pass is on the assertion.
 
 ### Step 8: Read Executor Metrics and Timing
 
@@ -113,7 +113,7 @@ Write a JSON file with this structure:
 
 ```json
 {
-  "expectations": [
+  "assertion_results": [
     {
       "text": "The output includes the name 'John Smith'",
       "passed": true,
@@ -189,9 +189,9 @@ Write a JSON file with this structure:
 
 ## Field Descriptions
 
-- **expectations**: Array of graded expectations
-  - **text**: The original expectation text
-  - **passed**: Boolean - true if expectation passes
+- **assertion_results**: Array of graded assertions
+  - **text**: The original assertion text
+  - **passed**: Boolean - true if assertion passes
   - **evidence**: Specific quote or description supporting the verdict
 - **summary**: Aggregate statistics
   - **passed**: Count of passed expectations
@@ -222,6 +222,6 @@ Write a JSON file with this structure:
 - **Be objective**: Base verdicts on evidence, not assumptions
 - **Be specific**: Quote the exact text that supports your verdict
 - **Be thorough**: Check both transcript and output files
-- **Be consistent**: Apply the same standard to each expectation
+- **Be consistent**: Apply the same standard to each assertion
 - **Explain failures**: Make it clear why evidence was insufficient
-- **No partial credit**: Each expectation is pass or fail, not partial
+- **No partial credit**: Each assertion is pass or fail, not partial

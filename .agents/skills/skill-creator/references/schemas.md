@@ -17,7 +17,7 @@ Defines the evals for a skill. Located at `evals/evals.json` within the skill di
       "prompt": "User's example prompt",
       "expected_output": "Description of expected result",
       "files": ["evals/files/sample1.pdf"],
-      "expectations": ["The output includes X", "The skill used script Y"]
+      "assertions": ["The output includes X", "The skill used script Y"]
     }
   ]
 }
@@ -30,7 +30,7 @@ Defines the evals for a skill. Located at `evals/evals.json` within the skill di
 - `evals[].prompt`: The task to execute
 - `evals[].expected_output`: Human-readable description of success
 - `evals[].files`: Optional list of input file paths (relative to skill root)
-- `evals[].expectations`: List of verifiable statements
+- `evals[].assertions`: List of verifiable statements
 
 ---
 
@@ -47,21 +47,21 @@ Tracks version progression in Improve mode. Located at workspace root.
     {
       "version": "v0",
       "parent": null,
-      "expectation_pass_rate": 0.65,
+      "assertion_pass_rate": 0.65,
       "grading_result": "baseline",
       "is_current_best": false
     },
     {
       "version": "v1",
       "parent": "v0",
-      "expectation_pass_rate": 0.75,
+      "assertion_pass_rate": 0.75,
       "grading_result": "won",
       "is_current_best": false
     },
     {
       "version": "v2",
       "parent": "v1",
-      "expectation_pass_rate": 0.85,
+      "assertion_pass_rate": 0.85,
       "grading_result": "won",
       "is_current_best": true
     }
@@ -76,7 +76,7 @@ Tracks version progression in Improve mode. Located at workspace root.
 - `current_best`: Version identifier of the best performer
 - `iterations[].version`: Version identifier (v0, v1, ...)
 - `iterations[].parent`: Parent version this was derived from
-- `iterations[].expectation_pass_rate`: Pass rate from grading
+- `iterations[].assertion_pass_rate`: Pass rate from grading
 - `iterations[].grading_result`: "baseline", "won", "lost", or "tie"
 - `iterations[].is_current_best`: Whether this is the current best version
 
@@ -88,7 +88,7 @@ Output from the grader agent. Located at `<run-dir>/grading.json`.
 
 ```json
 {
-  "expectations": [
+  "assertion_results": [
     {
       "text": "The output includes the name 'John Smith'",
       "passed": true,
@@ -150,7 +150,7 @@ Output from the grader agent. Located at `<run-dir>/grading.json`.
 
 **Fields:**
 
-- `expectations[]`: Graded expectations with evidence
+- `assertion_results[]`: Graded assertions with evidence
 - `summary`: Aggregate pass/fail counts
 - `execution_metrics`: Tool usage and output size (from executor's metrics.json)
 - `timing`: Wall clock timing (from timing.json)
@@ -249,7 +249,7 @@ Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
         "tool_calls": 18,
         "errors": 0
       },
-      "expectations": [{ "text": "...", "passed": true, "evidence": "..." }],
+      "assertion_results": [{ "text": "...", "passed": true, "evidence": "..." }],
       "notes": ["Used 2023 data, may be stale", "Fell back to text overlay for non-fillable fields"]
     }
   ],
@@ -266,9 +266,9 @@ Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
       "tokens": { "mean": 2100, "stddev": 300, "min": 1800, "max": 2500 }
     },
     "delta": {
-      "pass_rate": "+0.50",
-      "time_seconds": "+13.0",
-      "tokens": "+1700"
+      "pass_rate": 0.5,
+      "time_seconds": 13.0,
+      "tokens": 1700
     }
   },
 
@@ -296,7 +296,7 @@ Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
   - `result`: Nested object with `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
 - `run_summary`: Statistical aggregates per configuration
   - `with_skill` / `without_skill`: Each contains `pass_rate`, `time_seconds`, `tokens` objects with `mean` and `stddev` fields
-  - `delta`: Difference strings like `"+0.50"`, `"+13.0"`, `"+1700"`
+  - `delta`: Numeric differences — `pass_rate` (float), `time_seconds` (float), `tokens` (int). Use `f"{v:+.2f}"` in display code to format with sign.
 - `notes`: Freeform observations from the analyzer
 
 **Important:** The viewer reads these field names exactly. Using `config` instead of `configuration`, or putting `pass_rate` at the top level of a run instead of nested under `result`, will cause the viewer to show empty/zero values. Always reference this schema when generating benchmark.json manually.
